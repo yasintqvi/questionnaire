@@ -19,6 +19,11 @@ type Questionnaire struct {
 }
 
 func (q *Questionnaire) AddQuestion(question Question) {
+
+	if question.ID == uuid.Nil {
+		question.ID = uuid.New()
+	}
+
 	question.QuestionnaireId = q.ID
 	q.Questions = append(q.Questions, question)
 }

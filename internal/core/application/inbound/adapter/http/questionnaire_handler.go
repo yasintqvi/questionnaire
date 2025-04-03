@@ -124,6 +124,28 @@ func (questionnaireHandler QuestionnaireHandler) UpdateQuestionnaire(writer http
 	}
 }
 
+func (questionnaireHandler QuestionnaireHandler) DeleteQuestionnaire(writer http.ResponseWriter, request *http.Request) {
+	vars := mux.Vars(request)
+
+	idStr := vars["id"]
+
+	id, err := uuid.Parse(idStr)
+
+	if err != nil {
+		panic(err)
+	}
+
+	err = questionnaireHandler.service.DeleteQuestionnaire(id)
+
+	if err != nil {
+		panic(err)
+	}
+
+	writer.Header().Set("Content-Type", "application/json")
+
+	writer.WriteHeader(http.StatusNoContent)
+}
+
 func NewQuestionnaireHandler(service *service.QuestionnaireService) *QuestionnaireHandler {
 	return &QuestionnaireHandler{service: service}
 }

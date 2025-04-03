@@ -2,7 +2,6 @@ package adapter
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/google/uuid"
 	"questionare/internal/core/domain"
 	"time"
@@ -24,7 +23,7 @@ func (questionnaireRepo QuestionnaireRepositoryMySql) GetAll() ([]*domain.Questi
 	}
 
 	defer rows.Close()
-	fmt.Println(rows)
+
 	var questionnaires []*domain.Questionnaire
 	for rows.Next() {
 		var questionnaire domain.Questionnaire

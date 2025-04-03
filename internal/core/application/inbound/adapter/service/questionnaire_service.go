@@ -136,6 +136,21 @@ func (questionnaireService QuestionnaireService) UpdateQuestionnaire(id uuid.UUI
 	return questionnaireResponse, nil
 }
 
+func (questionnaireService QuestionnaireService) DeleteQuestionnaire(id uuid.UUID) error {
+
+	questionnaire, err := questionnaireService.questionnaireRepository.FindById(id)
+
+	if err != nil {
+		return err
+	}
+
+	if err := questionnaireService.questionnaireRepository.DeleteById(questionnaire.ID); err != nil {
+		log.Fatal(err)
+	}
+
+	return nil
+}
+
 func NewQuestionnaireService(repository port.QuestionnaireRepository) *QuestionnaireService {
 	return &QuestionnaireService{repository}
 }

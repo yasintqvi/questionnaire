@@ -48,6 +48,7 @@ func main() {
 	router.HandleFunc("/api/questionnaires/{id}", questionnaireHandler.FindQuestionnaireById).Methods(http.MethodGet)
 	router.HandleFunc("/api/questionnaires/create", questionnaireHandler.CreateQuestionnaire).Methods(http.MethodPost)
 	router.HandleFunc("/api/questionnaires/{id}", questionnaireHandler.UpdateQuestionnaire).Methods(http.MethodPut)
+	router.HandleFunc("/api/questionnaires/{id}", questionnaireHandler.DeleteQuestionnaire).Methods(http.MethodDelete)
 
 	err := http.ListenAndServe(os.Getenv("SERVER_URL")+":"+os.Getenv("SERVER_PORT"), router)
 

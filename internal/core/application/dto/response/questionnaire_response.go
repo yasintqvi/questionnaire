@@ -10,6 +10,7 @@ type QuestionnaireResponse struct {
 	Description string    `json:"description"`
 	StartTime   string    `json:"start_time"`
 	EndTime     string    `json:"end_time"`
+	Status      bool      `json:"status"`
 	CreatedAt   string    `json:"created_at"`
 	UpdatedAt   string    `json:"updated_at"`
 }

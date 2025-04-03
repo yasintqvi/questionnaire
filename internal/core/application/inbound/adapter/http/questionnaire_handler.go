@@ -71,7 +71,43 @@ func (questionnaireHandler QuestionnaireHandler) CreateQuestionnaire(writer http
 		panic(err)
 	}
 
-	questionnaire, err := questionnaireHandler.service.CreateQuestionnaire(questionnaireRequest)
+	questionnaire, err := questionnaireHandler.service.CreateQuestionnaire(&questionnaireRequest)
+
+	if err != nil {
+		panic(err)
+	}
+
+	writer.Header().Set("Content-Type", "application/json")
+
+	writer.WriteHeader(http.StatusCreated)
+
+	err = json.NewEncoder(writer).Encode(questionnaire)
+
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (questionnaireHandler QuestionnaireHandler) UpdateQuestionnaire(writer http.ResponseWriter, request *http.Request) {
+	var questionnaireRequest requestDTO.QuestionnaireUpdateRequest
+
+	err := json.NewDecoder(request.Body).Decode(&questionnaireRequest)
+
+	if err != nil {
+		panic(err)
+	}
+
+	vars := mux.Vars(request)
+
+	idStr := vars["id"]
+
+	id, err := uuid.Parse(idStr)
+
+	if err != nil {
+		panic(err)
+	}
+
+	questionnaire, err := questionnaireHandler.service.UpdateQuestionnaire(id, &questionnaireRequest)
 
 	if err != nil {
 		panic(err)

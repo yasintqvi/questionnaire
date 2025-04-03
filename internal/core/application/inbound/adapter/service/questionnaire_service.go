@@ -31,6 +31,7 @@ func (questionnaireService QuestionnaireService) GetAllQuestionnaires() ([]*resp
 			Description: questionnaire.Description,
 			StartTime:   questionnaire.StartTime.Format(time.DateTime),
 			EndTime:     questionnaire.EndTime.Format(time.DateTime),
+			Status:      questionnaire.Status,
 			CreatedAt:   questionnaire.CreatedAt.Format(time.DateTime),
 			UpdatedAt:   questionnaire.UpdatedAt.Format(time.DateTime),
 		})
@@ -54,12 +55,13 @@ func (questionnaireService QuestionnaireService) FindQuestionnaireById(id uuid.U
 		Description: questionnaire.Description,
 		StartTime:   questionnaire.StartTime.Format(time.DateTime),
 		EndTime:     questionnaire.EndTime.Format(time.DateTime),
+		Status:      questionnaire.Status,
 		CreatedAt:   questionnaire.CreatedAt.Format(time.DateTime),
 		UpdatedAt:   questionnaire.UpdatedAt.Format(time.DateTime),
 	}, nil
 }
 
-func (questionnaireService QuestionnaireService) CreateQuestionnaire(request request.QuestionnaireCreateRequest) (*response.QuestionnaireResponse, error) {
+func (questionnaireService QuestionnaireService) CreateQuestionnaire(request *request.QuestionnaireCreateRequest) (*response.QuestionnaireResponse, error) {
 
 	startTime, err := time.Parse(time.DateTime, request.StartTime)
 
@@ -83,17 +85,55 @@ func (questionnaireService QuestionnaireService) CreateQuestionnaire(request req
 		return nil, err
 	}
 
-	questionResponse := &response.QuestionnaireResponse{
+	questionnaireResponse := &response.QuestionnaireResponse{
 		ID:          newQuestionnaire.ID,
 		Title:       newQuestionnaire.Title,
 		Description: newQuestionnaire.Description,
 		StartTime:   newQuestionnaire.StartTime.Format(time.DateTime),
 		EndTime:     newQuestionnaire.EndTime.Format(time.DateTime),
+		Status:      newQuestionnaire.Status,
 		CreatedAt:   newQuestionnaire.CreatedAt.Format(time.DateTime),
 		UpdatedAt:   newQuestionnaire.UpdatedAt.Format(time.DateTime),
 	}
 
-	return questionResponse, nil
+	return questionnaireResponse, nil
+}
+
+func (questionnaireService QuestionnaireService) UpdateQuestionnaire(id uuid.UUID, request *request.QuestionnaireUpdateRequest) (*response.QuestionnaireResponse, error) {
+	startTime, err := time.Parse(time.DateTime, request.StartTime)
+	endTime, err := time.Parse(time.DateTime, request.EndTime)
+
+	if err != nil {
+		return nil, err
+	}
+
+	questionnaire := domain.Questionnaire{
+		ID:          id,
+		Title:       request.Title,
+		Description: request.Description,
+		Status:      request.Status,
+		StartTime:   startTime,
+		EndTime:     endTime,
+	}
+
+	updatedQuestionnaire, err := questionnaireService.questionnaireRepository.Update(&questionnaire)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	questionnaireResponse := &response.QuestionnaireResponse{
+		ID:          updatedQuestionnaire.ID,
+		Title:       updatedQuestionnaire.Title,
+		Description: updatedQuestionnaire.Description,
+		StartTime:   updatedQuestionnaire.StartTime.Format(time.DateTime),
+		EndTime:     updatedQuestionnaire.EndTime.Format(time.DateTime),
+		Status:      updatedQuestionnaire.Status,
+		CreatedAt:   updatedQuestionnaire.CreatedAt.Format(time.DateTime),
+		UpdatedAt:   updatedQuestionnaire.UpdatedAt.Format(time.DateTime),
+	}
+
+	return questionnaireResponse, nil
 }
 
 func NewQuestionnaireService(repository port.QuestionnaireRepository) *QuestionnaireService {

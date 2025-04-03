@@ -7,11 +7,11 @@ import (
 	"time"
 )
 
-type MysqlChoiceRepository struct {
+type ChoiceRepositoryMySql struct {
 	db *sql.DB
 }
 
-func (choiceRepo MysqlChoiceRepository) GetAll(questionId uuid.UUID) ([]*domain.Choice, error) {
+func (choiceRepo ChoiceRepositoryMySql) GetAll(questionId uuid.UUID) ([]*domain.Choice, error) {
 
 	query := `
 		SELECT id, choice_id, value, created_at, updated_at, deleted_at FROM choices q
@@ -44,7 +44,7 @@ func (choiceRepo MysqlChoiceRepository) GetAll(questionId uuid.UUID) ([]*domain.
 	return choices, nil
 }
 
-func (choiceRepo MysqlChoiceRepository) FindById(id uuid.UUID) (*domain.Choice, error) {
+func (choiceRepo ChoiceRepositoryMySql) FindById(id uuid.UUID) (*domain.Choice, error) {
 	query := "SELECT id, choice_id, value, created_at, updated_at, deleted_at FROM choices WHERE id = ? AND deleted_at IS NULL"
 
 	row := choiceRepo.db.QueryRow(query, id)
@@ -60,7 +60,7 @@ func (choiceRepo MysqlChoiceRepository) FindById(id uuid.UUID) (*domain.Choice, 
 	return &choice, nil
 }
 
-func (choiceRepo MysqlChoiceRepository) Create(choice *domain.Choice) (*domain.Choice, error) {
+func (choiceRepo ChoiceRepositoryMySql) Save(choice *domain.Choice) (*domain.Choice, error) {
 
 	query := "INSERT INTO choices (id, choice_id, value, created_at, updated_at) VALUES (?, ?, ?, ?, ?)"
 
@@ -75,7 +75,7 @@ func (choiceRepo MysqlChoiceRepository) Create(choice *domain.Choice) (*domain.C
 	return choice, nil
 }
 
-func (choiceRepo MysqlChoiceRepository) Update(choice *domain.Choice) (*domain.Choice, error) {
+func (choiceRepo ChoiceRepositoryMySql) Update(choice *domain.Choice) (*domain.Choice, error) {
 	query := "UPDATE choices SET title=?, choicenaire_id=? WHERE id=?"
 
 	_, err := choiceRepo.db.Exec(query, &choice.Value, &choice.QuestionId)
@@ -87,7 +87,7 @@ func (choiceRepo MysqlChoiceRepository) Update(choice *domain.Choice) (*domain.C
 	return choice, nil
 }
 
-func (choiceRepo MysqlChoiceRepository) Delete(id uuid.UUID) error {
+func (choiceRepo ChoiceRepositoryMySql) Delete(id uuid.UUID) error {
 	query := "UPDATE choices SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL"
 
 	_, err := choiceRepo.db.Exec(query, time.Now(), id)

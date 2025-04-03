@@ -8,7 +8,7 @@ import (
 type ChoiceRepository interface {
 	GetAll(questionId uuid.UUID) ([]*domain.Choice, error)
 	FindById(id uuid.UUID) (*domain.Choice, error)
-	Create(choice *domain.Choice) (*domain.Choice, error)
+	Save(choice *domain.Choice) (*domain.Choice, error)
 	Update(choice *domain.Choice) (*domain.Choice, error)
 	Delete(id uuid.UUID) error
 }

@@ -6,16 +6,16 @@ import (
 )
 
 type Questionnaire struct {
-	ID          uuid.UUID
-	Title       string
-	Description string
-	Status      bool
-	StartTime   time.Time
-	EndTime     time.Time
+	ID          uuid.UUID `db:"id"`
+	Title       string    `db:"title"`
+	Description string    `db:"description"`
+	Status      bool      `db:"status"`
+	StartTime   time.Time `db:"start_time"`
+	EndTime     time.Time `db:"end_time"`
 	Questions   []Question
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   *time.Time
+	CreatedAt   time.Time  `db:"created_at"`
+	UpdatedAt   time.Time  `db:"updated_at"`
+	DeletedAt   *time.Time `db:"deleted_at"`
 }
 
 func (q *Questionnaire) AddQuestion(question Question) {

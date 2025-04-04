@@ -14,9 +14,9 @@ type QuestionRepositoryMySql struct {
 func (questionRepo QuestionRepositoryMySql) GetAll(questionnaireId uuid.UUID) ([]*domain.Question, error) {
 
 	query := `
-		SELECT id, questionnaire_id, title, created_at, updated_at, deleted_at FROM questions q
-		                                                                       WHERE q.questionnaire_id = ?
-		                                                                         AND q.deleted_at IS NULL`
+		SELECT id, questionnaire_id, title, created_at, updated_at, deleted_at FROM questions 
+		                                                                       WHERE questionnaire_id = ?
+		                                                                         AND deleted_at IS NULL`
 
 	rows, err := questionRepo.db.Query(query, questionnaireId)
 
@@ -51,9 +51,10 @@ func (questionRepo QuestionRepositoryMySql) FindById(id uuid.UUID) (*domain.Ques
 
 	var question domain.Question
 
-	err := row.Scan(&question.ID, &question.Title, &question.CreatedAt, &question.UpdatedAt, &question.DeletedAt)
+	err := row.Scan(&question.ID, &question.QuestionnaireId, &question.Title, &question.CreatedAt, &question.UpdatedAt, &question.DeletedAt)
 
 	if err != nil {
+
 		return nil, err
 	}
 
@@ -76,9 +77,9 @@ func (questionRepo QuestionRepositoryMySql) Save(question *domain.Question) (*do
 }
 
 func (questionRepo QuestionRepositoryMySql) Update(question *domain.Question) (*domain.Question, error) {
-	query := "UPDATE questions SET title=?, questionnaire_id=? WHERE id=?"
+	query := "UPDATE questions SET title = ?, questionnaire_id=? WHERE id=?"
 
-	_, err := questionRepo.db.Exec(query, &question.Title, &question.QuestionnaireId)
+	_, err := questionRepo.db.Exec(query, question.Title, question.QuestionnaireId, question.ID)
 
 	if err != nil {
 		return nil, err

@@ -41,14 +41,30 @@ func main() {
 	db := getClientDb()
 
 	questionnaireRepo := adapter.NewMysqlQuestionnaireRepository(db)
+	questionRepo := adapter.NewMysqlQuestionRepository(db)
+	choiceRepo := adapter.NewMysqlChoiceRepository(db)
 
 	questionnaireHandler := httpHandler.NewQuestionnaireHandler(service.NewQuestionnaireService(questionnaireRepo))
+	questionHandler := httpHandler.NewQuestionHandler(service.NewQuestionService(questionRepo))
+	choiceHandler := httpHandler.NewChoiceHandler(service.NewChoiceService(choiceRepo))
 
 	router.HandleFunc("/api/questionnaires", questionnaireHandler.GetAllQuestionnaires).Methods(http.MethodGet)
 	router.HandleFunc("/api/questionnaires/{id}", questionnaireHandler.FindQuestionnaireById).Methods(http.MethodGet)
 	router.HandleFunc("/api/questionnaires/create", questionnaireHandler.CreateQuestionnaire).Methods(http.MethodPost)
 	router.HandleFunc("/api/questionnaires/{id}", questionnaireHandler.UpdateQuestionnaire).Methods(http.MethodPut)
 	router.HandleFunc("/api/questionnaires/{id}", questionnaireHandler.DeleteQuestionnaire).Methods(http.MethodDelete)
+
+	router.HandleFunc("/api/questionnaires/{questionnaire_id}/questions", questionHandler.GetAllQuestions).Methods(http.MethodGet)
+	router.HandleFunc("/api/questionnaires/{questionnaire_id}/questions/{question_id}", questionHandler.FindQuestionById).Methods(http.MethodGet)
+	router.HandleFunc("/api/questionnaires/{questionnaire_id}/questions", questionHandler.CreateQuestion).Methods(http.MethodPost)
+	router.HandleFunc("/api/questionnaires/{questionnaire_id}/questions/{question_id}", questionHandler.UpdateQuestion).Methods(http.MethodPut)
+	router.HandleFunc("/api/questionnaires/{questionnaire_id}/questions/{question_id}", questionHandler.DeleteQuestion).Methods(http.MethodDelete)
+
+	router.HandleFunc("/api/questions/{question_id}/choices", choiceHandler.GetAllChoices).Methods(http.MethodGet)
+	router.HandleFunc("/api/questions/{question_id}/choices/{choice_id}", choiceHandler.FindChoiceById).Methods(http.MethodGet)
+	router.HandleFunc("/api/questions/{question_id}/choices", choiceHandler.CreateChoice).Methods(http.MethodPost)
+	router.HandleFunc("/api/questions/{question_id}/choices/{choice_id}", choiceHandler.UpdateChoice).Methods(http.MethodPut)
+	router.HandleFunc("/api/questions/{question_id}/choices/{choice_id}", choiceHandler.DeleteChoice).Methods(http.MethodDelete)
 
 	err := http.ListenAndServe(os.Getenv("SERVER_URL")+":"+os.Getenv("SERVER_PORT"), router)
 

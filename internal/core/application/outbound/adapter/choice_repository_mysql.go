@@ -14,8 +14,8 @@ type ChoiceRepositoryMySql struct {
 func (choiceRepo ChoiceRepositoryMySql) GetAll(questionId uuid.UUID) ([]*domain.Choice, error) {
 
 	query := `
-		SELECT id, choice_id, value, created_at, updated_at, deleted_at FROM choices q
-		                                                                       WHERE choice_id = ?
+		SELECT id, question_id, value, created_at, updated_at, deleted_at FROM choices q
+		                                                                       WHERE question_id = ?
 		                                                                         AND deleted_at IS NULL`
 
 	rows, err := choiceRepo.db.Query(query, questionId)
@@ -45,13 +45,13 @@ func (choiceRepo ChoiceRepositoryMySql) GetAll(questionId uuid.UUID) ([]*domain.
 }
 
 func (choiceRepo ChoiceRepositoryMySql) FindById(id uuid.UUID) (*domain.Choice, error) {
-	query := "SELECT id, choice_id, value, created_at, updated_at, deleted_at FROM choices WHERE id = ? AND deleted_at IS NULL"
+	query := "SELECT id, question_id, value, created_at, updated_at, deleted_at FROM choices WHERE id = ? AND deleted_at IS NULL"
 
 	row := choiceRepo.db.QueryRow(query, id)
 
 	var choice domain.Choice
 
-	err := row.Scan(&choice.ID, &choice.Value, &choice.CreatedAt, &choice.UpdatedAt, &choice.DeletedAt)
+	err := row.Scan(&choice.ID, &choice.QuestionId, &choice.Value, &choice.CreatedAt, &choice.UpdatedAt, &choice.DeletedAt)
 
 	if err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func (choiceRepo ChoiceRepositoryMySql) FindById(id uuid.UUID) (*domain.Choice, 
 
 func (choiceRepo ChoiceRepositoryMySql) Save(choice *domain.Choice) (*domain.Choice, error) {
 
-	query := "INSERT INTO choices (id, choice_id, value, created_at, updated_at) VALUES (?, ?, ?, ?, ?)"
+	query := "INSERT INTO choices (id, question_id, value, created_at, updated_at) VALUES (?, ?, ?, ?, ?)"
 
 	choice.ID = uuid.New()
 
@@ -76,9 +76,9 @@ func (choiceRepo ChoiceRepositoryMySql) Save(choice *domain.Choice) (*domain.Cho
 }
 
 func (choiceRepo ChoiceRepositoryMySql) Update(choice *domain.Choice) (*domain.Choice, error) {
-	query := "UPDATE choices SET title=?, choicenaire_id=? WHERE id=?"
+	query := "UPDATE choices SET title=?, question_id=? WHERE id=?"
 
-	_, err := choiceRepo.db.Exec(query, &choice.Value, &choice.QuestionId)
+	_, err := choiceRepo.db.Exec(query, &choice.Value, &choice.QuestionId, choice.ID)
 
 	if err != nil {
 		return nil, err
@@ -97,4 +97,8 @@ func (choiceRepo ChoiceRepositoryMySql) Delete(id uuid.UUID) error {
 	}
 
 	return nil
+}
+
+func NewMysqlChoiceRepository(db *sql.DB) ChoiceRepositoryMySql {
+	return ChoiceRepositoryMySql{db: db}
 }
